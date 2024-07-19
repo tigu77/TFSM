@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TFSM.Example
 {
-    //상태는 언박싱을 막기 위해 IEquatable<T>을 구현해야 한다
+    //상태는 언박싱을 막기 위해 IEquatable<T>를 구현해야 한다
     public struct SomeState : IEquatable<SomeState>
     {
         public enum Type
@@ -35,7 +35,7 @@ namespace TFSM.Example
     }
 
 
-    //예제 상태구현의 대한 베이스 클래스
+    //예제 상태구현 베이스 클래스
     public abstract class SomeStateBase : BaseState<SomeState, StateMachineExample>
     {
         private Coroutine _coroutine;
@@ -135,7 +135,7 @@ namespace TFSM.Example
 
         private void Update()
         {
-            //현재 상태의 구현체에 바로 접근
+            //현재 상태의 구현체에서 바로 호출
             _stateMachine.CurrentImplement.UpdateExternal();
         }
     }
