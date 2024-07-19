@@ -1,22 +1,42 @@
 # Unity와 C#에서 사용 가능한 일반적인 상태 기계
 
 ``` C#
+using System;
 using System.Collections;
 using UnityEngine;
 
 namespace TFSM.Example
 {
-    //예제 상태
-    public enum ESomeState
+    //상태는 언박싱을 막기 위해 IEquatable<T>을 구현해야 한다
+    public struct SomeState : IEquatable<SomeState>
     {
-        SomeState1,
-        SomeState2,
-        SomeState3,
+        public enum Type
+        {
+            SomeState1,
+            SomeState2,
+            SomeState3
+        }
+
+        private Type type;
+        
+
+        public readonly bool Equals(SomeState other)
+        {
+            return type == other.type;
+        }
+
+        public static implicit operator SomeState(Type type)
+        {
+            return new SomeState
+            {
+                type = type
+            };
+        }
     }
 
 
     //예제 상태구현의 대한 베이스 클래스
-    public abstract class SomeStateBase : BaseState<ESomeState, StateMachineExample>
+    public abstract class SomeStateBase : BaseState<SomeState, StateMachineExample>
     {
         private Coroutine _coroutine;
 
@@ -57,7 +77,7 @@ namespace TFSM.Example
         {
             yield return new WaitForSeconds(1f);
 
-            StateMachine.ChangeState(ESomeState.SomeState2);
+            StateMachine.ChangeState(SomeState.Type.SomeState2);
         }
     }
 
@@ -67,7 +87,7 @@ namespace TFSM.Example
         {
             yield return new WaitForSeconds(1f);
 
-            StateMachine.ChangeState(ESomeState.SomeState3);
+            StateMachine.ChangeState(SomeState.Type.SomeState3);
         }
     }
 
@@ -84,7 +104,7 @@ namespace TFSM.Example
         {
             if(Time.time >= _endTime)
             {                
-                StateMachine.ChangeState(Random.Range(0, 2) == 0 ? ESomeState.SomeState1 : ESomeState.SomeState2);
+                StateMachine.ChangeState(UnityEngine.Random.Range(0, 2) == 0 ? SomeState.Type.SomeState1 : SomeState.Type.SomeState2);
             }            
         }
     }
@@ -92,14 +112,14 @@ namespace TFSM.Example
 
     public class StateMachineExample : MonoBehaviour
     {        
-        private StateMachine<ESomeState, SomeStateBase, StateMachineExample> _stateMachine;
+        private StateMachine<SomeState, SomeStateBase, StateMachineExample> _stateMachine;
 
         private void Awake()
         {            
-            _stateMachine = new StateMachine<ESomeState, SomeStateBase, StateMachineExample>(this);
-            _stateMachine.AddState<SomeState1>(ESomeState.SomeState1);
-            _stateMachine.AddState<SomeState2>(ESomeState.SomeState2);
-            _stateMachine.AddState<SomeState3>(ESomeState.SomeState3);
+            _stateMachine = new StateMachine<SomeState, SomeStateBase, StateMachineExample>(this);
+            _stateMachine.AddState<SomeState1>(SomeState.Type.SomeState1);
+            _stateMachine.AddState<SomeState2>(SomeState.Type.SomeState2);
+            _stateMachine.AddState<SomeState3>(SomeState.Type.SomeState3);
 
             //상태 변경에 대한 예외 처리가 필요한 부분은 콜백으로 구현
             _stateMachine.TryChangeState = (current, next) =>
@@ -110,7 +130,7 @@ namespace TFSM.Example
 
         private void Start()
         {
-            _stateMachine.StartState(ESomeState.SomeState1);
+            _stateMachine.StartState(SomeState.Type.SomeState1);
         }
 
         private void Update()
@@ -120,5 +140,6 @@ namespace TFSM.Example
         }
     }
 }
+
 
 ```
