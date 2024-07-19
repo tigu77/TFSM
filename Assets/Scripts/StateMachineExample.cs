@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TFSM.Example
 {
-    //상태는 언박싱을 막기 위해 IEquatable<T>를 구현해야 한다
+    //상태는 박싱을 막기 위해 IEquatable<T>를 구현해야 한다
     public struct SomeState : IEquatable<SomeState>
     {
         public enum Type
